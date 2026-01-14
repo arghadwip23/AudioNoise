@@ -7,7 +7,7 @@ struct biquad_coeff {
 };
 
 struct biquad_state {
-	float w1, w2;
+	float x[2], y[2];
 };
 
 struct biquad {
@@ -15,24 +15,19 @@ struct biquad {
 	struct biquad_state state;
 };
 
-static inline float _biquad_step(struct biquad_coeff *c, struct biquad_state *s, float x0)
-{
-	float w0, w1 = s->w1, w2 = s->w2;
-	float y0;
-
-	w0 = x0 - c->a1 * w1 - c->a2 * w2;
-	y0 = c->b0 * w0 + c->b1 * w1 + c->b2 * w2;
-	s->w2 = w1; s->w1 = w0;
-	return y0;
-}
-
-// When chaining biquads, direct form 1 may be more convenient
+// Direct form 1 may need more state than the "canonical" DF2,
+// but gets noisy much quicker.
 static inline float biquad_step_df1(struct biquad_coeff *c, float in, float x[2], float y[2])
 {
 	float out = c->b0*in + c->b1*x[0] + c->b2*x[1] - c->a1*y[0] - c->a2*y[1];
 	x[1] = x[0]; x[0] = in;
 	y[1] = y[0]; y[0] = out;
 	return out;
+}
+
+static inline float _biquad_step(struct biquad_coeff *c, struct biquad_state *s, float x0)
+{
+	return biquad_step_df1(c, x0, s->x, s->y);
 }
 
 static inline void _biquad_lpf(struct biquad_coeff *res, float f, float Q)

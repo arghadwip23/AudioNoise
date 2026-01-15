@@ -4,10 +4,6 @@
 #include <string.h>
 #include <math.h>
 
-typedef int s32;
-typedef unsigned int u32;
-typedef unsigned int uint;
-
 #define SAMPLES_PER_SEC (48000.0)
 
 // Core utility functions and helpers
@@ -27,7 +23,7 @@ typedef unsigned int uint;
 #include "distortion.h"
 
 static void magnitude_init(float pot1, float pot2, float pot3, float pot4) {}
-static float magnitude_step(float in) { return uint_to_fraction(magnitude); }
+static float magnitude_step(float in) { return u32_to_fraction(magnitude); }
 
 #define EFF(x) { #x, x##_init, x##_step }
 struct effect {

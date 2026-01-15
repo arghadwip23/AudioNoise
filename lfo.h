@@ -30,7 +30,7 @@ enum lfo_type {
 };
 
 struct lfo_state {
-	uint idx, step;
+	u32 idx, step;
 };
 
 // Use this for LFO initializers.
@@ -38,7 +38,7 @@ struct lfo_state {
 
 static inline void set_lfo_step(struct lfo_state *lfo, float step)
 {
-	lfo->step = (uint) rintf(step);
+	lfo->step = (u32) rintf(step);
 }
 
 void set_lfo_freq(struct lfo_state *lfo, float freq)
@@ -56,16 +56,16 @@ void set_lfo_ms(struct lfo_state *lfo, float ms)
 
 float lfo_step(struct lfo_state *lfo, enum lfo_type type)
 {
-	uint now = lfo->idx;
-	uint next = now + lfo->step;
+	u32 now = lfo->idx;
+	u32 next = now + lfo->step;
 
 	lfo->idx = next;
 
 	if (type == lfo_sawtooth)
-		return uint_to_fraction(now);
+		return u32_to_fraction(now);
 
 	float val;
-	uint quarter = now >> 30;
+	u32 quarter = now >> 30;
 	now <<= 2;
 
 	// Second and fourth quarter reverses direction
@@ -73,14 +73,14 @@ float lfo_step(struct lfo_state *lfo, enum lfo_type type)
 		now = ~now;
 
 	if (type == lfo_sinewave) {
-		uint idx = now >> (32-QUARTER_SINE_STEP_SHIFT);
+		u32 idx = now >> (32-QUARTER_SINE_STEP_SHIFT);
 		float a = quarter_sin[idx];
 		float b = quarter_sin[idx+1];
 
 		now <<= QUARTER_SINE_STEP_SHIFT;
-		val = a + (b-a)*uint_to_fraction(now);
+		val = a + (b-a)*u32_to_fraction(now);
 	} else {
-		val = uint_to_fraction(now);
+		val = u32_to_fraction(now);
 	}
 
 	// Last two quarters are negative

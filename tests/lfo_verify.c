@@ -4,10 +4,6 @@
 #include <string.h>
 #include <math.h>
 
-typedef int s32;
-typedef unsigned int u32;
-typedef unsigned int uint;
-
 #define SAMPLES_PER_SEC (48000.0)
 
 #include "../util.h"
@@ -18,13 +14,13 @@ static struct lfo_state lfo;
 int main(int argc, char **argv)
 {
 	float maxerr = 0;
-	uint maxidx = 0;
+	u32 maxidx = 0;
 
 	// This checks every 2**32 value and can be very slow.
 	// Only run on a fast machine
 	lfo.step = 1;
 	do {
-		uint idx = lfo.idx;
+		u32 idx = lfo.idx;
 		float val = lfo_step(&lfo, lfo_sinewave);
 		float s = (idx / TWO_POW_32) * 2 * M_PI;
 		float exact = sin(s);

@@ -1,6 +1,22 @@
 // Various utility functions mainly for
 // imprecise but fast floating point
 
+//
+// Sized integer types I'm used to from the kernel.
+//
+// I dislike 'uint32_t' as being unwieldly (and historically not
+// available in all environments, so you end up with a mess of
+// configuration), and 'uint' as not having a well-defined size.
+//
+// I'm not using the 64-bit types yet, but the RP2354 has 32x32
+// multiplies giving a 64-bit result, so I'm considering doing
+// some fixed-point math, and this preps for it.
+//
+typedef int s32;
+typedef unsigned int u32;
+typedef long long s64;
+typedef unsigned long long u64;
+
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 #define TWO_POW_32 (4294967296.0f)
@@ -39,14 +55,14 @@ static inline float limit_value(float x)
 	return x*(1 - 0.19*x2 + 0.0162*x4);
 }
 
-static inline float uint_to_fraction(uint val)
+static inline float u32_to_fraction(u32 val)
 {
 	return (1.0/TWO_POW_32) * val;
 }
 
-static inline uint fraction_to_uint(float val)
+static inline u32 fraction_to_u32(float val)
 {
-	return (uint) (val * TWO_POW_32);
+	return (u32) (val * TWO_POW_32);
 }
 
 // Max ~1.25s delays at ~52kHz
@@ -57,7 +73,7 @@ extern int sample_array_index;
 
 static inline void sample_array_write(float val)
 {
-	uint idx = SAMPLE_ARRAY_MASK & ++sample_array_index;
+	u32 idx = SAMPLE_ARRAY_MASK & ++sample_array_index;
 	sample_array[idx] = val;
 }
 
